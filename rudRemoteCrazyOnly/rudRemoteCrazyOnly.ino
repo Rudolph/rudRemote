@@ -20,11 +20,23 @@
 // send debug info to Serial?
 bool $DEBUG = 0;
 
-// the analog pins your gimbals are plugged into
-#define lStickX  A0     // left stick, X (horizontal) direction
-#define lStickY  A1     // left stick, Y (vertical) direction
-#define rStickX  A2     // right stick, X
-#define rStickY  A3     // left stick, Y
+// The analog pins your gimbals are plugged into, and the minimum and
+// maximum values for each, as determined by running rudRemoteStickFinder.
+#define lStickX  A9     // left stick, X (horizontal) direction (yaw)
+#define lStickXMin 192
+#define lStickXMax 367
+
+#define lStickY  A8     // left stick, Y (vertical) direction (throttle)
+#define lStickYMin 174
+#define lStickYMax 363
+
+#define rStickX  A7     // right stick, X (roll)
+#define rStickXMin 158
+#define rStickXMax 346
+
+#define rStickY  A6     // right stick, Y (pitch)
+#define rStickYMin 181
+#define rStickYMax 365
 
 // Radio channel
 // My Crazyflie 2.0 is on channel 80. I have no idea if yours is too,
@@ -95,41 +107,21 @@ void loop(){
   if(millis() - lastLoop > 100){
     lastLoop = millis();
 
-    // test gimbals
-//    crtp.pitch = map(analogRead(rStickY), 0, 1023, 30.0, -30.0);
-//    if(abs(crtp.pitch) < 3)
-//      crtp.pitch = 0;
-//    
-//    crtp.roll = map(analogRead(rStickX), 930, 60, 30.0, -30.0);
-//    if(abs(crtp.roll) < 3)
-//      crtp.roll = 0;
-//    
-//    float yaw = map(analogRead(lStickX), 0, 1023, -200.0, 200.0);
-//    if(abs(yaw) < 10)
-//      yaw = 0;
-//    crtp.yaw = constrain(yaw, -200.0, 200.0);
-//
-//    uint16_t t = map(analogRead(lStickY), 0, 996, 0, 50000);
-//    if(t < 10000)
-//      t = 0;
-//    crtp.thrust = constrain(t, 0, 50000);
-
-
-    // Tower Hobbies radio gimbals
-    crtp.pitch = map(analogRead(rStickY), 365, 181, 30.0, -30.0);
+    // Get the sticks' readings
+    crtp.pitch = map(analogRead(rStickY), rStickYMax, rStickYMin, 30.0, -30.0);
     if(abs(crtp.pitch) < 3)
       crtp.pitch = 0;
     
-    crtp.roll = map(analogRead(rStickX), 346, 158, 30.0, -30.0);
+    crtp.roll = map(analogRead(rStickX), rStickXMax, rStickXMin, 30.0, -30.0);
     if(abs(crtp.roll) < 3)
       crtp.roll = 0;
     
-    float yaw = map(analogRead(lStickX), 173, 354, -200.0, 200.0);
+    float yaw = map(analogRead(lStickX), lStickXMin, lStickXMax, -200.0, 200.0);
     if(abs(yaw) < 15)
       yaw = 0;
     crtp.yaw = constrain(yaw, -200.0, 200.0);
     
-    uint16_t t = map(analogRead(lStickY), 174, 363, 0, 50000);
+    uint16_t t = map(analogRead(lStickY), lStickYMin, lStickYMax, 0, 50000);
     if(t < 10000)
       t = 0;
     crtp.thrust = constrain(t, 0, 50000);

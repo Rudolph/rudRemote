@@ -8,10 +8,10 @@
  */
 
 // the analog pins your gimbals are plugged into
-#define lStickX  A0     // left stick, X (horizontal) direction
-#define lStickY  A1     // left stick, Y (vertical) direction
-#define rStickX  A2     // right stick, X
-#define rStickY  A3     // left stick, Y
+#define lStickX  A9     // left stick, X (horizontal) direction
+#define lStickY  A8     // left stick, Y (vertical) direction
+#define rStickX  A7     // right stick, X
+#define rStickY  A6     // left stick, Y
 
 void setup() {
   // put your setup code here, to run once:
