@@ -1,5 +1,5 @@
 /*
- * crazyTestTransmitter
+ * rudRemoteCrazyOnly
  * 
  * based on jpihet's Crazyflie Arduino Controller:
  * https://github.com/jpihet/crazyflie-arduino-controller
@@ -76,7 +76,7 @@ void setup(){
   Serial.begin(9600);
   printf_begin();           // not needed on Teensy, though apparently doesn't hurt
   //while(!Serial){};       // not needed on Uno (hrm, or Teensy? Sometime?)
-  Serial.println("crazyTestTransmitter");
+  Serial.println("rudRemoteCrazyOnly");
   
   radio.begin();
   
