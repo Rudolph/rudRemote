@@ -4,6 +4,7 @@
  * Just spits out the analog values of the control stick positions.
  * Used to find the min/max values to put in the rudRemote settings.
  * 
+ * Copyright © 2018 Del Rudolph, http://www.darthRudolph.com/ <del@darthrudolph.com>
  * Released under the MIT License, see included file LICENSE
  */
 

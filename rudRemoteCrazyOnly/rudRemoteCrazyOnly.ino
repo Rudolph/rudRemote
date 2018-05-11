@@ -9,6 +9,7 @@
  * I recommend using the Tmrh20 RF24 library because that's what I used
  * You can find it in the Arduino library manager
  * 
+ * Copyright © 2018 Del Rudolph, http://www.darthRudolph.com/ <del@darthrudolph.com>
  * Released under the MIT License, see included file "LICENSE"
  */
 
