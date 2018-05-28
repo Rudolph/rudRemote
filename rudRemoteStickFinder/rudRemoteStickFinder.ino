@@ -17,8 +17,12 @@
 #define rStickX  A7     // right stick, X (roll) (channel 1 in Mode 2)
 #define rStickY  A6     // left stick, Y (pitch) (channel 2 in Mode 2)
 
+#define channelFive 24
+#define channelSix A3
+
 void setup() {
   // put your setup code here, to run once:
+  pinMode(channelFive, INPUT_PULLUP);
   Serial.begin(9600);
   Serial.println("rudRemoteStickFinder");  
 }
@@ -32,6 +36,10 @@ void loop() {
   Serial.print(" RX: ");
   Serial.print(analogRead(rStickX));
   Serial.print(" RY: ");
-  Serial.println(analogRead(rStickY));
+  Serial.print(analogRead(rStickY));
+  Serial.print(" 5: ");
+  Serial.print(digitalRead(channelFive));
+  Serial.print(" 6: ");
+  Serial.println(analogRead(channelSix));
   delay(100);
 }
