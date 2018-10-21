@@ -13,7 +13,9 @@
  * Which was based on tbitson's Crazyflie Arduino Controller:
  * https://bitbucket.org/tbitson/crazyflie-arduino-controller
  * 
- * I recommend using the TMRh20 RF24 library because that's what I used
+ * I recommend using the TMRh20 RF24 library because that's what I used, so things
+ * may not work with a different RF24 library.
+ * http://tmrh20.github.io/RF24/
  * You can find it in the Arduino library manager by searching for "RF24"
  * and installing the one from TMRh20.
  * 
@@ -39,15 +41,14 @@ RF24 radio(CEPIN, CSNPIN);
 Encoder theEncoder(ENCA,ENCB);
 
 // some vars to hold things
-boolean needsDrawn = false;
+volatile boolean needsDrawn = false;
 uint32_t lastDrawn = 0;
 int16_t oldCount = 0;
 int16_t newCount = 0;
-boolean buttonClicked = false;
+volatile boolean buttonClicked = false;
 uint32_t lastLoop = 0;
 uint8_t theMode = 0;
 
-// set up CRTP for the Crazyflie 2.0
 // port and channel for sending control commands
 #define PORT_COMMANDER 3
 #define PORT_CHANNEL 0
@@ -65,20 +66,32 @@ typedef struct
 // create an instance of the CRTP command packet
 cmdPacket crtp;
 
-// a place to put ack packets
-char payload[32];
+// a place to put ack packets from the Crazyflie
+uint8_t crtpAck[32];
+
+// create an instance of rudPacket
+rudTx rudPacket;
+
+// a place to put ack packets from rudRx-es
+// TODO: do something with this, or remove it and do something else
+typedef struct
+{
+  char name[9]; // each 'bot should have a name, not to exceed 8 chars, with a space to end with \0
+} __attribute__((__packed__)) rudRxAck;
+
+rudRxAck rudAck;
 
 /* 
  * and now for the menus
  * 
  * each menu gets four things
- * first, define menu count, how many items are in the menu
+ * first, define menu count, i.e. how many items are in the menu
  * second, a char array of the menu items, first one is always the "back to
  *  previous menu" entry. e.g. Exit, Main Menu...
  * third and fourth, a couple of notes-to-self about which menu is selected and
  *  which menu page is currently showing
  */
-boolean showMenu = false;
+volatile boolean showMenu = false;
 
 // Main Menu
 #define mainMenuCount 3
@@ -107,9 +120,6 @@ void setup() {
 
   // fire up Serial
   Serial.begin(9600);
-  #ifdef DEBUG
-    while(!Serial){};
-  #endif
   Serial.println("rudRemote");
   
   // start the OLED
@@ -142,6 +152,15 @@ void setup() {
   crtp.pitch  = 0.0;
   crtp.yaw    = 0.0;
   crtp.thrust = 0;
+
+  // define initial values for rudPacket
+  rudPacket.header = (PORT_COMMANDER & 0xF) << 4 | 3 << 2 | (PORT_CHANNEL & 0x03);
+  rudPacket.ch1 = 0;
+  rudPacket.ch2 = 0;
+  rudPacket.ch3 = 0;
+  rudPacket.ch4 = 0;
+  rudPacket.ch5 = 0;
+  rudPacket.ch6 = 0;
 
   #ifdef DEBUG
     delay(3000);
@@ -195,19 +214,28 @@ void loop() {
 
   // if theMode is set and timeout has been reached get sticks' values and 
   // send the appropriate packet
-  if((theMode > 0) && (millis() - lastLoop > 100)){
+  if((theMode > 0) && (millis() - lastLoop >= 50)){
     lastLoop = millis();
     if(theMode == 2){
       // crazy mode
       getCrazySticks();
       sendCrazyPacket();
+      
+      #ifdef DEBUG
+        printCRTPValues();
+      #endif
     }else if(theMode == 1){
       // robot mode
+      getRudSticks();
+      sendRudPacket();
+      
+      #ifdef DEBUG
+        //printRudValues();
+      #endif
+      
     }
 
-    #ifdef DEBUG
-      printCRTPValues();
-    #endif
+
   }
 }
 

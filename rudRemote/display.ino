@@ -64,6 +64,10 @@ void drawScreen(){
           if(theMode == 2){
             // if crazy mode, get radio set up
             setCrazyRadio();
+          }else if(theMode == 1){
+            // if robot mode, set up radio on that channel
+            // TODO: make this so you can choose a pipe (i.e. robot) to talk to
+            setRudRx(0);
           }
           
           mainMenuSelected = 0;

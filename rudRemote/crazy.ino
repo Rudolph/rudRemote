@@ -39,11 +39,11 @@ void getCrazySticks(){
     yaw = 0;
   crtp.yaw = constrain(yaw, -200.0, 200.0);
 
-  // this should really be 65k instead of 50000, but until I fly better...
-  uint16_t t = map(analogRead(lStickY), lStickYMin, lStickYMax, 0, 65000);
+  // was at 50000, can be up to 65k it seems
+  uint16_t t = map(analogRead(lStickY), lStickYMin, lStickYMax, 0, 60000);
   if(t < 10000)
     t = 0;
-  crtp.thrust = constrain(t, 0, 65000);
+  crtp.thrust = constrain(t, 0, 60000);
 }
 
 // sends the CRTP packet to the Crazyflie 2.0 and gets the ACK packet
@@ -54,7 +54,11 @@ void sendCrazyPacket(){
       Serial.println("CRTP packet sent");
     #endif
     len = radio.getDynamicPayloadSize();
-    radio.read(&payload, len);
+    radio.read(&crtpAck, len);
+  }else{
+    #ifdef DEBUG
+      Serial.println("crazy write failed");
+    #endif
   }
   
   #ifdef DEBUG
@@ -62,12 +66,9 @@ void sendCrazyPacket(){
       Serial.print("Ack received, size ");
       Serial.println(len);
       for(int i=0;i<=len;i++){
-        Serial.print(payload[i]);
+        Serial.print(crtpAck[i]);
       }
       Serial.println("");
-    }else{
-      // should probably count lost packets or something
-      Serial.println("Write failed");
     }
   #endif
 }
